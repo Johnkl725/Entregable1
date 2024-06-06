@@ -1,4 +1,6 @@
-# Tu código original aquí
+import tkinter as tk
+from tkinter import scrolledtext, messagebox
+
 def scanner():
     global CadFuente, PosActual, token
     token = ""
@@ -35,14 +37,16 @@ def scanner():
             PosActual += 1  # Saltar el carácter final de la cadena
         mostrar_resultado(f"Cadena: {token}")
     else:
-        print(f"Error Lexicografico: Carácter No Valido '{CadFuente[PosActual]}'")  # Carácter No Valido
+        messagebox.showerror("Error Lexicografico", f"Carácter No Valido '{CadFuente[PosActual]}'")  # Carácter No Valido
     token = ""
 
-def procesar_codigo(codigo_fuente):
+def procesar_codigo():
     global CadFuente, PosActual, token
-    CadFuente = codigo_fuente.strip()
+    CadFuente = textoEntrada.get("1.0", tk.END).strip()
     PosActual = 0
     token = ""
+    textoSalida.config(state=tk.NORMAL)
+    textoSalida.delete("1.0", tk.END)
     while PosActual < len(CadFuente):
         try:
             scanner()
@@ -50,21 +54,37 @@ def procesar_codigo(codigo_fuente):
         except Exception as e:
             mostrar_resultado(str(e))
             break
+    textoSalida.config(state=tk.DISABLED)
 
 def mostrar_resultado(mensaje):
-    print(mensaje)
+    textoSalida.config(state=tk.NORMAL)
+    textoSalida.insert(tk.END, mensaje + "\n")
+    textoSalida.config(state=tk.DISABLED)
 
-# Ejemplo de uso
-codigo_fuente = """
-entero a
-entero b,c=3
-real x,suma,y = 4.8
-si a>b
-    b = c+1
-    mientras x<8
-        a = b+y
-        x = x+1
-    finmientras
-finsi
-"""
-procesar_codigo(codigo_fuente)
+# Interfaz gráfica
+root = tk.Tk()
+root.title("Escaner de Código")
+root.geometry("800x600")
+
+frameEntrada = tk.Frame(root)
+frameEntrada.pack(padx=10, pady=10)
+
+labelEntrada = tk.Label(frameEntrada, text="Ingrese el código fuente:")
+labelEntrada.pack(pady=5)
+
+textoEntrada = scrolledtext.ScrolledText(frameEntrada, width=80, height=10)
+textoEntrada.pack(pady=5)
+
+botonProcesar = tk.Button(frameEntrada, text="Procesar Código", command=procesar_codigo)
+botonProcesar.pack(pady=5)
+
+frameSalida = tk.Frame(root)
+frameSalida.pack(padx=10, pady=10)
+
+labelSalida = tk.Label(frameSalida, text="Salida:")
+labelSalida.pack(pady=5)
+
+textoSalida = scrolledtext.ScrolledText(frameSalida, width=80, height=20, state=tk.DISABLED)
+textoSalida.pack(pady=5)
+
+root.mainloop()
